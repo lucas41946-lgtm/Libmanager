@@ -3,6 +3,8 @@ const express = require('express');
 const cors = require('cors');
 const pool = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
+const livroRoutes = require('./routes/livroRoutes');
+const categoriaRoutes = require('./routes/categoriaRoutes');
 
 const app = express();
 app.use(cors());
@@ -12,8 +14,9 @@ app.get('/', (req, res) => {
   res.json({ status: 'ok', api: 'LibManager' });
 });
 
-// rotas de autenticação
 app.use('/api/auth', authRoutes);
+app.use('/api/livros', livroRoutes);
+app.use('/api/categorias', categoriaRoutes);
 
 pool.getConnection()
   .then((conn) => {
