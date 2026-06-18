@@ -6,6 +6,7 @@ const authRoutes = require('./routes/authRoutes');
 const livroRoutes = require('./routes/livroRoutes');
 const categoriaRoutes = require('./routes/categoriaRoutes');
 const leitorRoutes = require('./routes/leitorRoutes');
+const emprestimoRoutes = require('./routes/emprestimoRoutes');
 
 const app = express();
 app.use(cors());
@@ -19,6 +20,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/livros', livroRoutes);
 app.use('/api/categorias', categoriaRoutes);
 app.use('/api/leitores', leitorRoutes);
+app.use('/api/emprestimos', emprestimoRoutes);
 
 pool.getConnection()
   .then((conn) => {

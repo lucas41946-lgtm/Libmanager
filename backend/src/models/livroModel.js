@@ -1,7 +1,6 @@
 const pool = require('../config/db');
 
 async function listar() {
-  // LEFT JOIN traz o NOME da categoria junto de cada livro (relacionamento 1:N)
   const [linhas] = await pool.query(
     `SELECT l.id, l.titulo, l.autor, l.ano_publicacao, l.status,
             l.categoria_id, c.nome AS categoria
@@ -20,4 +19,13 @@ async function criar({ titulo, autor, ano_publicacao, categoria_id }) {
   return { id: resultado.insertId };
 }
 
-module.exports = { listar, criar };
+async function buscarPorId(id) {
+  const [linhas] = await pool.query('SELECT * FROM livros WHERE id = ?', [id]);
+  return linhas[0];
+}
+
+async function atualizarStatus(id, status) {
+  await pool.query('UPDATE livros SET status = ? WHERE id = ?', [status, id]);
+}
+
+module.exports = { listar, criar, buscarPorId, atualizarStatus };
