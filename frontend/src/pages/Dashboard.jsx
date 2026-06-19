@@ -4,19 +4,23 @@ import api from '../api/axios';
 export default function Dashboard() {
   const [livros, setLivros] = useState([]);
   const [leitores, setLeitores] = useState([]);
+  const [leitorSelecionado, setLeitorSelecionado] = useState('');
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState('');
 
   async function carregar() {
     setErro('');
     try {
-      // busca livros e leitores em paralelo
       const [resLivros, resLeitores] = await Promise.all([
         api.get('/livros'),
         api.get('/leitores'),
       ]);
       setLivros(resLivros.data);
       setLeitores(resLeitores.data);
+      // por padrão já seleciona o primeiro, mas você pode trocar
+      if (resLeitores.data.length > 0) {
+        setLeitorSelecionado((prev) => prev || String(resLeitores.data[0].id));
+      }
     } catch (err) {
       setErro('Erro ao carregar o acervo. Verifique se o servidor está rodando.');
     } finally {
@@ -24,20 +28,22 @@ export default function Dashboard() {
     }
   }
 
-  // useEffect roda ao abrir a tela -> carrega os dados da API
   useEffect(() => {
     carregar();
   }, []);
 
   async function emprestar(livro) {
-    if (leitores.length === 0) {
-      alert('Cadastre um leitor antes de emprestar.');
+    if (!leitorSelecionado) {
+      alert('Cadastre e selecione um leitor antes de emprestar.');
       return;
     }
     try {
-      // empresta pro primeiro leitor (a tela de Empréstimos permite escolher)
-      await api.post('/emprestimos', { leitor_id: leitores[0].id, livro_id: livro.id });
-      carregar(); // recarrega a lista
+      // agora usa o leitor ESCOLHIDO no seletor
+      await api.post('/emprestimos', {
+        leitor_id: Number(leitorSelecionado),
+        livro_id: livro.id,
+      });
+      carregar();
     } catch (err) {
       alert(err.response?.data?.erro || 'Erro ao emprestar.');
     }
@@ -51,6 +57,21 @@ export default function Dashboard() {
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-semibold">Acervo de Livros</h2>
           <span className="text-sm text-accent">{livros.length} Livros Cadastrados</span>
+        </div>
+
+        {/* escolha de quem vai pegar o livro emprestado */}
+        <div className="flex items-center gap-2 mb-4 text-sm">
+          <span className="text-slate-400">Emprestar para:</span>
+          <select
+            value={leitorSelecionado}
+            onChange={(e) => setLeitorSelecionado(e.target.value)}
+            className="bg-base border border-edge rounded-md px-3 py-1.5 text-sm outline-none focus:border-accent"
+          >
+            <option value="">Selecione um leitor</option>
+            {leitores.map((l) => (
+              <option key={l.id} value={l.id}>{l.nome_completo}</option>
+            ))}
+          </select>
         </div>
 
         {carregando && <p className="text-slate-400 text-sm">Carregando...</p>}
