@@ -3,8 +3,9 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Sidebar from './components/Sidebar';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import NovoLivro from './pages/NovoLivro';
+import NovoLeitor from './pages/NovoLeitor';
 
-// layout das telas internas: sidebar fixa + área de conteúdo
 function Layout({ children }) {
   return (
     <div className="flex min-h-screen bg-base">
@@ -18,12 +19,9 @@ export default function App() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
-      <Route path="/" element={
-        <ProtectedRoute>
-          <Layout><Dashboard /></Layout>
-        </ProtectedRoute>
-      } />
-      {/* temporário: links ainda não criados voltam pro dashboard */}
+      <Route path="/" element={<ProtectedRoute><Layout><Dashboard /></Layout></ProtectedRoute>} />
+      <Route path="/livros/novo" element={<ProtectedRoute><Layout><NovoLivro /></Layout></ProtectedRoute>} />
+      <Route path="/leitores/novo" element={<ProtectedRoute><Layout><NovoLeitor /></Layout></ProtectedRoute>} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
